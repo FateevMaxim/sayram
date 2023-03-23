@@ -1,0 +1,31 @@
+{
+    "name": "Sayram999",
+    "short_name": "Sayram999",
+    "start_url": "/",
+    "background_color": "#f4ede7",
+    "description": "Sayram999",
+    "display" : "standalone",
+    "orientation" : "portrait",
+    "lang": "ru",
+    "theme_color": "#f4ede7",
+    "icons": [
+        {
+        "src": "/favicons/192x192.jpg",
+        "type": "image/jpg",
+        "sizes": "192x192",
+            "purpose": "android"
+        },
+        {
+            "src": "/favicons/512x512.jpg",
+            "sizes": "512x512",
+            "type": "image/jpg",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/favicons/512x512.jpg",
+            "sizes": "512x512",
+            "type": "image/jpg",
+            "purpose": "any"
+        }
+    ]
+}
