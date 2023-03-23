@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Nur-777 - доставка товаров из Китая</title>
+        <title>{{ env('APP_NAME') }} - доставка товаров из Китая</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -33,7 +33,7 @@
 
             <div class="max-w-7xl mx-auto p-6 lg:p-8">
                 <div class="flex justify-center">
-                    <img src="{{asset('images/logo.png')}}" width="250" alt="Nur-777">
+                    <img src="{{asset('images/logo.png')}}" width="250" alt="{{ env('APP_NAME') }}">
                 </div>
 
                 <div class="mt-16">
