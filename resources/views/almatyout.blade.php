@@ -60,9 +60,12 @@
                                             <x-primary-button class="mx-auto w-full">
                                                 {{ __('Выдать клиенту') }}
                                             </x-primary-button>
-                                            <x-secondary-button class="mx-auto mt-4 w-full" id="clear">
-                                                {{ __('Отправить дальше') }}
-                                            </x-secondary-button>
+                                            @if(env('SEND_FORWARD'))
+                                                <x-secondary-button class="mx-auto mt-4 w-full" id="clear">
+                                                    {{ __('Отправить дальше') }}
+                                                </x-secondary-button>
+                                            @endif
+
                                         </div>
                                 </form>
                             </div>
