@@ -6,13 +6,9 @@
         <title>{{ env('APP_NAME') }} - доставка товаров из Китая</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <!– PWA  –>
-
         <meta name=”theme-color” content=”#6777ef”/>
-
         <link rel=”apple-touch-icon” href=”{{ asset('/favicons/512x512.png') }}”>
-
         <link rel=”manifest” href=”{{ asset('/manifest.json') }}”>
-        <title>{{ config('app.name', 'Cargo') }}</title>
         <link rel="apple-touch-icon" sizes="57x57" href="/apple-icon-57x57.png">
         <link rel="apple-touch-icon" sizes="60x60" href="/apple-icon-60x60.png">
         <link rel="apple-touch-icon" sizes="72x72" href="/apple-icon-72x72.png">
