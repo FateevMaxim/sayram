@@ -128,7 +128,7 @@
                                     data: users,
                                     stack: 'Stack 0',
                                 }, {
-                                    label: "Алматы",
+                                    label: "Сайрам",
                                     backgroundColor: "#31c48d",
                                     data: users2,
                                     stack: 'Stack 1',
@@ -194,7 +194,7 @@
                                     data: usersDays,
                                     stack: 'Stack 0',
                                 }, {
-                                    label: "Алматы",
+                                    label: "Сайрам",
                                     backgroundColor: "#31c48d",
                                     data: usersDays2,
                                     stack: 'Stack 1',
