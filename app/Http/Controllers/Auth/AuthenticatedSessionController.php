@@ -21,7 +21,8 @@ class AuthenticatedSessionController extends Controller
     {
         if (Auth::user() && Auth::user()->getRememberToken()){
             return redirect()->route('dashboard');
-        }$config = Configuration::query()->select('whats_app', 'title_text', 'address_two')->first();
+        }
+        $config = Configuration::query()->select('whats_app', 'title_text', 'address_two')->first();
         return view('auth.login')->with(compact( 'config'));
     }
 
