@@ -32,7 +32,7 @@
                         </div>
                         <div class="grid grid-cols-1 p-4 min_height round_border relative">
                             <div class="grid mx-auto">
-                                <img src="{{ asset('images/barcode.jpg') }}" width="200" alt="Barcode">
+                                <img src="{{ asset('images/ch_barcode.jpg') }}" width="200" alt="Barcode">
                                 <b class="mx-auto" style="margin-top: -45px;">Upload Data</b>
                             </div>
                             <div id="track">
@@ -114,7 +114,7 @@
 
                         </script>
                     </div>
-                    @include('components.scanner-settings')
+                    @include('components.ch_scanner-settings')
             </div>
         </div>
 </x-app-layout>
