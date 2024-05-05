@@ -4,8 +4,11 @@
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
                 @if(session()->has('message'))
-                    <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                    <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50" role="alert">
                         <span class="font-medium">{{ session()->get('message') }}
+                            @if(session('rowCount'))
+                                <p>Количество треков: {{ session('rowCount')['Sheet1'] }}</p>
+                              @endif
                     </div>
                 @endif
 
@@ -38,7 +41,7 @@
                             <h3 class="mt-0 p-4 text-2xl font-medium leading-tight text-primary">Пункт приёма China</h3>
                         </div>
                         <div class="p-4">
-                            <span>Количество зарегистрированных трек кодов за сегодня</span>
+                            <span>Количество зарегистрированных трек кодов за сегодня </span>
                             <h3 class="mt-0 text-2xl font-medium leading-tight text-primary">{{ $count }}</h3>
                         </div>
                     </div>

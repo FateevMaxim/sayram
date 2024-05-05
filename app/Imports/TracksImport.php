@@ -6,23 +6,20 @@ use App\Models\TrackList;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterImport;
+use Throwable;
 
-class TracksImport implements ToModel, SkipsOnError
+class TracksImport implements ToModel, SkipsOnError, WithEvents
 {
 
     use Importable;
     private $date;
+    private $rowCount = 0;
 
     public function __construct(string $date)
     {
         $this->date = $date;
-    }
-    /**
-     * @param \Throwable $e
-     */
-    public function onError(\Throwable $e)
-    {
-        // Handle the exception how you'd like.
     }
     /**
     * @param array $row
@@ -40,5 +37,25 @@ class TracksImport implements ToModel, SkipsOnError
                 'created_at' => date(now()),
             ]);
         }
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterImport::class => function(AfterImport $event) {
+                $reader = $event->getReader();
+                $this->rowCount = $reader->getTotalRows();
+            },
+        ];
+    }
+
+    public function getRowCount()
+    {
+        return $this->rowCount;
+    }
+
+    public function onError(Throwable $e)
+    {
+        // TODO: Implement onError() method.
     }
 }

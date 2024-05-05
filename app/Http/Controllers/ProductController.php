@@ -177,8 +177,12 @@ class ProductController extends Controller
 
     public function fileImport(Request $request)
     {
-        Excel::import(new TracksImport($request['date']), $request->file('file')->store('temp'));
-        return back();
+        $import = new TracksImport($request['date']);
+        Excel::import($import, $request->file('file')->store('temp'));
+
+        $rowCount = $import->getRowCount();
+
+        return back()->with('message', 'Загрузка прошла успешно!')->with('rowCount', $rowCount);
     }
 
     public function result ()
