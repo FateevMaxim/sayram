@@ -32,6 +32,11 @@ class TracksImport implements
         $this->date = $date;
     }
 
+    public function readDataOnly(): bool
+    {
+        return true;          // <-- обязательный метод интерфейса
+    }
+
     public function model(array $row)
     {
         $trackCode = $row[1] ?? null;      // при необходимости поправьте индекс
