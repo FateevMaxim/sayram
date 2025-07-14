@@ -3,73 +3,106 @@
 namespace App\Imports;
 
 use App\Models\TrackList;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Importable;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithReadDataOnly;
-use Maatwebsite\Excel\Concerns\WithLimit;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithReadFilter;
+use Maatwebsite\Excel\Events\AfterImport;
+use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
 use Throwable;
 
-class TracksImport implements
-    ToModel,
-    WithBatchInserts,
-    WithChunkReading,
-    WithReadDataOnly,   // <-- добавлено
-    WithLimit,          // <-- добавлено
-    SkipsOnError
+class TracksImport implements ToModel, SkipsOnError, WithEvents, WithChunkReading, WithBatchInserts, SkipsEmptyRows, WithReadFilter
 {
     use Importable;
-
-    private string $date;
-    private int    $counter = 0;
+    private $date;
+    private $rowCount = 0;
 
     public function __construct(string $date)
     {
         $this->date = $date;
     }
 
-    public function readDataOnly(): bool
-    {
-        return true;          // <-- обязательный метод интерфейса
-    }
-
+    /**
+    * @param array $row
+    *
+    * @return \Illuminate\Database\Eloquent\Model|null
+    */
     public function model(array $row)
     {
-        $trackCode = $row[1] ?? null;      // при необходимости поправьте индекс
-
-        if (empty($trackCode)) {
+        // Skip rows with empty track code
+        if (empty($row[1])) {
             return null;
         }
 
-        ++$this->counter;
-
         return new TrackList([
-            'track_code' => $trackCode,
-            'to_china'   => $this->date,
-            'status'     => 'Получено в Китае',
-            'reg_china'  => 1,
-            'created_at' => Carbon::now(),
+            'track_code' => $row[1],
+            'to_china' => $this->date,
+            'status' => 'Получено в Китае',
+            'reg_china' => 1,
+            'created_at' => date(now()),
         ]);
     }
 
-    /* ---------- Ограничения ---------- */
-
-    public function limit(): int
+    public function registerEvents(): array
     {
-        // читаем не более 500 строк (с запасом)
-        return 500;
+        return [
+            AfterImport::class => function(AfterImport $event) {
+                $reader = $event->getReader();
+                $this->rowCount = $reader->getTotalRows();
+            },
+        ];
     }
 
-    public function batchSize(): int { return 200; }
-    public function chunkSize(): int { return 200; }
+    public function getRowCount()
+    {
+        return $this->rowCount;
+    }
 
-    /* ---------- Служебные ---------- */
+    public function onError(Throwable $e)
+    {
+        // TODO: Implement onError() method.
+    }
 
-    public function getRowCount(): int { return $this->counter; }
+    /**
+     * @return int
+     */
+    public function chunkSize(): int
+    {
+        return 100;
+    }
 
-    public function onError(Throwable $e) {\Log::error($e); }
+    /**
+     * @return int
+     */
+    public function batchSize(): int
+    {
+        return 100;
+    }
+
+    /**
+     * @return IReadFilter
+     */
+    public function readFilter(): IReadFilter
+    {
+        return new class implements IReadFilter {
+            public function readCell($columnAddress, $row, $worksheetName = '')
+            {
+                // Only read cells from the first sheet
+                if ($worksheetName !== 'Worksheet' && $worksheetName !== 'Sheet1' && $worksheetName !== '') {
+                    return false;
+                }
+
+                // Only read columns A and B (track codes are in column B)
+                if ($columnAddress === 'A' || $columnAddress === 'B') {
+                    return true;
+                }
+
+                return false;
+            }
+        };
+    }
 }
