@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -177,12 +178,22 @@ class ProductController extends Controller
 
     public function fileImport(Request $request)
     {
-        $import = new TracksImport($request['date']);
-        Excel::import($import, $request->file('file')->store('temp'));
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xlsx,xls'],
+            'date' => ['required', 'date'],
+        ]);
 
-        $rowCount = $import->getRowCount();
+        $path   = $request->file('file')->store('temp');      // сохраняем во временную папку
+        $import = new TracksImport($request->input('date'));
 
-        return back()->with('message', 'Загрузка прошла успешно!')->with('rowCount', $rowCount);
+        Excel::import($import, $path);                         // либо Excel::queueImport(...)
+
+        Storage::delete($path);                                // очищаем tmp-файл
+
+        return back()
+            ->with('message', 'Загрузка прошла успешно!')
+            ->with('rowCount', $import->getRowCount());
+
     }
 
     public function result ()

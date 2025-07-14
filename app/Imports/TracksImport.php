@@ -3,59 +3,74 @@
 namespace App\Imports;
 
 use App\Models\TrackList;
+use Illuminate\Support\Carbon;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterImport;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Throwable;
 
-class TracksImport implements ToModel, SkipsOnError, WithEvents
+class TracksImport implements
+    ToModel,
+    WithBatchInserts,
+    WithChunkReading,
+    SkipsOnError
 {
-
     use Importable;
-    private $date;
-    private $rowCount = 0;
+
+    private string $date;
+    private int    $counter = 0;
 
     public function __construct(string $date)
     {
         $this->date = $date;
     }
+
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * Возвращает модель для вставки или null, если строка пустая.
+     */
     public function model(array $row)
     {
-        if (isset($row[1])){
-            return new TrackList([
-                'track_code' => $row[1],
-                'to_china' => $this->date,
-                'status' => 'Получено в Китае',
-                'reg_china' => 1,
-                'created_at' => date(now()),
-            ]);
+        // $row[0] ‑ обычно колонка А в Excel; адаптируйте при необходимости
+        $trackCode = $row[1] ?? null;
+
+        if (empty($trackCode)) {
+            return null; // пропускаем пустые строки/заголовок
         }
+
+        ++$this->counter;
+
+        return new TrackList([
+            'track_code' => $trackCode,
+            'to_china'   => $this->date,
+            'status'     => 'Получено в Китае',
+            'reg_china'  => 1,
+            'created_at' => Carbon::now(), // корректнее, чем date(now())
+        ]);
     }
 
-    public function registerEvents(): array
+    /* ---------- Настройки пакетной работы ---------- */
+
+    public function batchSize(): int
     {
-        return [
-            AfterImport::class => function(AfterImport $event) {
-                $reader = $event->getReader();
-                $this->rowCount = $reader->getTotalRows();
-            },
-        ];
+        return 1000; // строк за один INSERT
     }
 
-    public function getRowCount()
+    public function chunkSize(): int
     {
-        return $this->rowCount;
+        return 1000; // строк читаем за проход
+    }
+
+    /* ---------- Служебные методы ---------- */
+
+    public function getRowCount(): int
+    {
+        return $this->counter;
     }
 
     public function onError(Throwable $e)
     {
-        // TODO: Implement onError() method.
+        Log::error($e);
     }
 }
