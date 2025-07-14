@@ -66,5 +66,5 @@ class TracksImport implements
 
     public function getRowCount(): int { return $this->counter; }
 
-    public function onError(Throwable $e) { Log::error($e); }
+    public function onError(Throwable $e) {\Log::error($e); }
 }
