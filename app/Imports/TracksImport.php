@@ -34,12 +34,12 @@ class TracksImport implements ToModel, SkipsOnError, WithEvents, WithChunkReadin
     public function model(array $row)
     {
         // Skip rows with empty track code
-        if (empty($row[1])) {
+        if (empty($row[0])) {
             return null;
         }
 
         return new TrackList([
-            'track_code' => $row[1],
+            'track_code' => $row[0],
             'to_china' => $this->date,
             'status' => 'Получено в Китае',
             'reg_china' => 1,
